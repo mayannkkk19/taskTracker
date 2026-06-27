@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Point this to your local backend server
+// Points to deployed backend server or local backend server
 const API_URL = 'http://localhost:5000/api/tasks';
 
 export const fetchTasks = () => axios.get(API_URL);
