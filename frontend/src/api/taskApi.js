@@ -1,9 +1,13 @@
 import axios from 'axios';
 
 // Points to deployed backend server or local backend server
-const API_URL = 'http://localhost:5000/api/tasks';
+const BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api` 
+  : 'http://localhost:5000/api';
 
-export const fetchTasks = () => axios.get(API_URL);
-export const createTask = (taskData) => axios.post(API_URL, taskData);
-export const updateTask = (id, updatedData) => axios.put(`${API_URL}/${id}`, updatedData);
-export const deleteTask = (id) => axios.delete(`${API_URL}/${id}`);
+const API = axios.create({ baseURL: BASE_URL });
+
+export const fetchTasks = () => axios.get(API);
+export const createTask = (taskData) => axios.post(API, taskData);
+export const updateTask = (id, updatedData) => axios.put(`${API}/${id}`, updatedData);
+export const deleteTask = (id) => axios.delete(`${API}/${id}`);
