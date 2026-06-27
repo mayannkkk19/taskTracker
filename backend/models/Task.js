@@ -23,7 +23,7 @@ const taskSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true // Automatically creates createdAt and updatedAt fields
+    timestamps: true 
   }
 );
 

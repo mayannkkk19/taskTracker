@@ -13,7 +13,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // Allows us to parse JSON bodies
+app.use(express.json());
 
 // Routes
 app.use('/api/tasks', require('./routes/taskRoutes'));
