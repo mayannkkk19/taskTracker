@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 function TaskForm({ onSave, taskToEdit, clearEdit }) {
-  // Directly initialize our state using the passed down task data (if it exists)
   const [title, setTitle] = useState(taskToEdit ? taskToEdit.title : '');
   const [description, setDescription] = useState(taskToEdit ? (taskToEdit.description || '') : '');
   const [status, setStatus] = useState(taskToEdit ? (taskToEdit.status || 'Pending') : 'Pending');

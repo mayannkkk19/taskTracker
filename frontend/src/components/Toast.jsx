@@ -29,13 +29,13 @@ function Toast({ message, type, onClose }) {
     if (type === 'error') {
       return { ...baseStyle, backgroundColor: '#dc3545' };
     }
-    return { ...baseStyle, backgroundColor: '#28a745' }; // default success green
+    return { ...baseStyle, backgroundColor: '#28a745' }; 
   };
 
   return (
     <div style={getToastStyle()}>
       {message}
-      {/* Dynamic slide-in keyframe effect injected natively */}
+
       <style>{`
         @keyframes slideIn {
           from { transform: translateY(100px); opacity: 0; }

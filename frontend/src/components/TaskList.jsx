@@ -1,7 +1,6 @@
 import TaskItem from './TaskItem';
 
 function TaskList({ tasks, onDelete, onEdit, onToggleStatus }) {
-  // Graceful placeholder check for when filtering yields 0 matching tasks
   if (tasks.length === 0) {
     return (
       <div style={emptyStateStyle}>
@@ -25,7 +24,7 @@ function TaskList({ tasks, onDelete, onEdit, onToggleStatus }) {
   );
 }
 
-// Clean UI styles for the empty state
+
 const emptyStateStyle = {
   textAlign: 'center',
   padding: '2rem',
