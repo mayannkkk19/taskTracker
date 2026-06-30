@@ -26,45 +26,66 @@ function TaskForm({ onSave, taskToEdit, clearEdit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formStyle}>
-      <h3>{taskToEdit ? '📝 Edit Task' : '➕ Add New Task'}</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
       
-      <div style={inputGroupStyle}>
-        <label>Task Title *</label>
+      {/* Title Input */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+          Task Title <span className="text-rose-500">*</span>
+        </label>
         <input
           type="text"
           placeholder="What needs to be done?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
+          className="w-full px-3 py-2 bg-slate-55 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 transition-all focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
         />
       </div>
 
-      <div style={inputGroupStyle}>
-        <label>Description</label>
+      {/* Description Input */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+          Description
+        </label>
         <textarea
           placeholder="Add some details..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{ ...inputStyle, height: '60px', resize: 'none' }}
+          className="w-full h-20 px-3 py-2 bg-slate-55 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 resize-none transition-all focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
         />
       </div>
 
-      <div style={inputGroupStyle}>
-        <label>Status</label>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
+      {/* Status Selection */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+          Initial Status
+        </label>
+        <select 
+          value={status} 
+          onChange={(e) => setStatus(e.target.value)} 
+          className="w-full px-3 py-2 bg-slate-55 border border-slate-200 rounded-lg text-sm text-slate-700 font-medium transition-all cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        >
           <option value="Pending">Pending</option>
           <option value="In Progress">In Progress</option>
           <option value="Completed">Completed</option>
         </select>
       </div>
 
-      <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
-        <button type="submit" style={submitButtonStyle}>
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 pt-2">
+        <button 
+          type="submit" 
+          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-150 cursor-pointer"
+        >
           {taskToEdit ? 'Update Task' : 'Add Task'}
         </button>
+        
         {taskToEdit && (
-          <button type="button" onClick={clearEdit} style={cancelButtonStyle}>
+          <button 
+            type="button" 
+            onClick={clearEdit} 
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-lg text-sm transition-colors cursor-pointer"
+          >
             Cancel
           </button>
         )}
@@ -72,47 +93,5 @@ function TaskForm({ onSave, taskToEdit, clearEdit }) {
     </form>
   );
 }
-
-// Basic inline styles
-const formStyle = {
-  background: '#f9f9f9',
-  padding: '1.5rem',
-  borderRadius: '8px',
-  marginBottom: '2rem',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-};
-
-const inputGroupStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  marginBottom: '1rem',
-  gap: '5px'
-};
-
-const inputStyle = {
-  padding: '8px',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  fontSize: '14px'
-};
-
-const submitButtonStyle = {
-  background: '#007bff',
-  color: 'white',
-  border: 'none',
-  padding: '10px 15px',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  fontWeight: 'bold'
-};
-
-const cancelButtonStyle = {
-  background: '#6c757d',
-  color: 'white',
-  border: 'none',
-  padding: '10px 15px',
-  borderRadius: '4px',
-  cursor: 'pointer'
-};
 
 export default TaskForm;

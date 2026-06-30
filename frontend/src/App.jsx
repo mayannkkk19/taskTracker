@@ -9,40 +9,28 @@ function App() {
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [toast, setToast] = useState(null);
 
-  // States for Filtering and Sorting
   const [filterStatus, setFilterStatus] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
 
-  // Memoized Notification Handler
   const showNotification = useCallback((message, type = 'success') => {
     setToast({ message, type });
   }, []);
 
-  // 1. Production-grade data lifecycle fetch directly within the effect body
   useEffect(() => {
     let isMounted = true;
-
     async function syncTasks() {
       try {
         const response = await fetchTasks();
-        if (isMounted) {
-          setTasks(response.data);
-        }
+        if (isMounted) setTasks(response.data);
       } catch (error) {
         console.error("Error loading tasks:", error);
-        // Using a functional state trigger to prevent any scope attachment flags
         setToast(() => ({ message: "Failed to fetch tasks from server", type: "error" }));
       }
     }
-
     syncTasks();
+    return () => { isMounted = false; };
+  }, []);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Empty dependency array is perfectly valid and clean now!
-
-  // 2. Extra helper to trigger manual list syncs on mutations without violating effect scopes
   const refreshTasksList = async () => {
     try {
       const response = await fetchTasks();
@@ -52,16 +40,11 @@ function App() {
     }
   };
 
-  // Compute the visible tasks dynamically using useMemo for optimal performance
   const processedTasks = useMemo(() => {
     let result = [...tasks];
-    
-    // Filter logic
     if (filterStatus !== 'All') {
       result = result.filter(task => task.status === filterStatus);
     }
-
-    // Sort logic
     if (sortBy === 'Newest') {
       result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     } else if (sortBy === 'Oldest') {
@@ -69,11 +52,9 @@ function App() {
     } else if (sortBy === 'Alphabetical') {
       result.sort((a, b) => a.title.localeCompare(b.title));
     }
-
     return result;
   }, [tasks, filterStatus, sortBy]);
 
-  // Handler to add or update a task
   const handleSaveTask = async (taskData) => {
     try {
       if (taskToEdit) {
@@ -91,7 +72,6 @@ function App() {
     }
   };
 
-  // Handler to change task status directly from the card
   const handleToggleStatus = async (id, currentStatus) => {
     let nextStatus = 'Pending';
     if (currentStatus === 'Pending') nextStatus = 'In Progress';
@@ -107,7 +87,6 @@ function App() {
     }
   };
 
-  // Handler to delete a task
   const handleDeleteTask = async (id) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
@@ -122,44 +101,82 @@ function App() {
   };
 
   return (
-    <div style={{margin: '0 auto', fontFamily: 'Arial' }}>
-      <h1 style={{ textAlign: 'center', color: '#333' }}>Task Tracker</h1>
-      
-      <TaskForm 
-        key={taskToEdit ? taskToEdit._id : 'new-task'}
-        onSave={handleSaveTask} 
-        taskToEdit={taskToEdit} 
-        clearEdit={() => setTaskToEdit(null)} 
-      />
-
-      {/* Control Bar UI for Filtering and Sorting */}
-      <div style={controlBarStyle}>
-        <div>
-          <label style={{ marginRight: '8px', fontWeight: 'bold' }}>Filter by Status:</label>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={selectStyle}>
-            <option value="All">All Tasks</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased pb-12">
+      {/* Top Glassmorphism Navbar Header */}
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/80 border-b border-slate-200/80 mb-8">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <h1 className="text-xl font-bold bg-gradient-to-r align-middle from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+              TaskTracker
+            </h1>
+          </div>
+          <div className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+            {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'} total
+          </div>
         </div>
+      </header>
 
-        <div>
-          <label style={{ marginRight: '8px', fontWeight: 'bold' }}>Sort by:</label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={selectStyle}>
-            <option value="Newest">Newest First</option>
-            <option value="Oldest">Oldest First</option>
-            <option value="Alphabetical">Alphabetical (A-Z)</option>
-          </select>
-        </div>
-      </div>
-      
-      <TaskList 
-        tasks={processedTasks} 
-        onDelete={handleDeleteTask} 
-        onEdit={setTaskToEdit} 
-        onToggleStatus={handleToggleStatus}
-      />
+      {/* Main Workspace layout */}
+      <main className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        {/* Left Hand Sticky Column: Creation Form */}
+        <section className="md:col-span-1">
+          <div className="sticky top-24 bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+              {taskToEdit ? '✏️ Edit Task' : '✨ Create Task'}
+            </h2>
+            <TaskForm 
+              key={taskToEdit ? taskToEdit._id : 'new-task'}
+              onSave={handleSaveTask} 
+              taskToEdit={taskToEdit} 
+              clearEdit={() => setTaskToEdit(null)} 
+            />
+          </div>
+        </section>
+
+        {/* Right Hand Dynamic Column: Controls & Dynamic List */}
+        <section className="md:col-span-2 space-y-6">
+          
+          {/* Enhanced Control Bar UI */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200/60 shadow-xs">
+            <div className="flex items-center gap-2 flex-1">
+              <label className="font-medium text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap">Filter</label>
+              <select 
+                value={filterStatus} 
+                onChange={(e) => setFilterStatus(e.target.value)} 
+                className="w-full sm:w-auto text-sm bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              >
+                <option value="All">All Tasks</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 flex-1 sm:justify-end">
+              <label className="font-medium text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap">Sort</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)} 
+                className="w-full sm:w-auto text-sm bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium py-1.5 px-3 rounded-lg border border-slate-200 transition-colors cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              >
+                <option value="Newest">Newest First</option>
+                <option value="Oldest">Oldest First</option>
+                <option value="Alphabetical">Alphabetical (A-Z)</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Interactive Task Stream Container */}
+          <TaskList 
+            tasks={processedTasks} 
+            onDelete={handleDeleteTask} 
+            onEdit={setTaskToEdit} 
+            onToggleStatus={handleToggleStatus}
+          />
+        </section>
+      </main>
 
       {toast && (
         <Toast 
@@ -171,27 +188,5 @@ function App() {
     </div>
   );
 }
-
-// Styles
-const controlBarStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  background: '#f1f3f5',
-  padding: '10px 15px',
-  borderRadius: '6px',
-  marginBottom: '1rem',
-  flexWrap: 'wrap',
-  gap: '10px'
-};
-
-const selectStyle = {
-  padding: '6px 10px',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  backgroundColor: '#fff',
-  fontSize: '14px',
-  cursor: 'pointer',
-  color: 'black'
-};
 
 export default App;

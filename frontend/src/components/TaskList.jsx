@@ -3,14 +3,20 @@ import TaskItem from './TaskItem';
 function TaskList({ tasks, onDelete, onEdit, onToggleStatus }) {
   if (tasks.length === 0) {
     return (
-      <div style={emptyStateStyle}>
-        <p>📭 No tasks found matching your current filter.</p>
+      <div className="flex flex-col items-center justify-center text-center p-12 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl mt-4">
+        <span className="text-3xl mb-2">📭</span>
+        <p className="text-base font-medium text-slate-500">
+          No tasks found matching your current filter.
+        </p>
+        <p className="text-xs text-slate-400 mt-1">
+          Try switching status views or create a brand new task item to populate the stream!
+        </p>
       </div>
     );
   }
 
   return (
-    <div style={listContainerStyle}>
+    <div className="flex flex-col gap-3.5 mt-4">
       {tasks.map((task) => (
         <TaskItem 
           key={task._id} 
@@ -23,24 +29,5 @@ function TaskList({ tasks, onDelete, onEdit, onToggleStatus }) {
     </div>
   );
 }
-
-
-const emptyStateStyle = {
-  textAlign: 'center',
-  padding: '2rem',
-  background: '#f8f9fa',
-  borderRadius: '8px',
-  color: '#6c757d',
-  border: '1px dashed #dee2e6',
-  marginTop: '1rem',
-  fontSize: '16px'
-};
-
-const listContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '15px',
-  marginTop: '1rem'
-};
 
 export default TaskList;
